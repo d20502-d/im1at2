@@ -4,6 +4,8 @@
   --main-bg-color: #333;
   --main-text-color: #fff;
   --main-btn-bg-color: #938989;
+  --accent: #e91e63; /* Music video accent for highlights (vibrant yet readable) */
+  --muted: #aaaaaa;
 }
 
 body,
@@ -15,7 +17,7 @@ ul {
 }
 
 body {
-  font-family: "Arial", sans-serif;
+  font-family: "generic-family", serif, sans-serif, monospace;
   background-color: var(--primary-bg-color);
   color: var(--text-color);
   line-height: 1.6;
@@ -68,46 +70,161 @@ nav a {
 .media-player {
   width: 100%;
   margin: 0 auto;
+  background: #111; /* Dark canvas to make video pop (music video aesthetic) */
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 }
 
 .media-player video {
   max-width: 100%;
+  width: 100%;
+  border-radius: 8px;
 }
 
 .custom-controls {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
   margin-top: 10px;
   width: 100%;
+  flex-wrap: wrap; /* Responsive: wrap controls on narrow screens */
 }
 
-.custom-controls button {
-  background-color: var(--main-btn-bg-color);
+/* Iconic controls for play/pause/skip etc. */
+.icon-btn {
+  background: #222;
+  border: 1px solid #333;
   color: var(--main-text-color);
-  border: none;
-  padding: 8px 12px;
+  padding: 6px 10px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 16px;
   display: flex;
   align-items: center;
+  transition: background 0.2s ease, transform 0.05s ease;
+}
+.icon-btn:hover {
+  background: #2c2c2c;
+}
+.icon-btn:active {
+  transform: scale(0.98);
+}
+.icon-btn img {
+  filter: invert(1);
+}
+
+/* Timeline/seekbar wrapper for better click targets */
+.timeline {
+  flex: 1 1 300px;
+  min-width: 160px;
 }
 
 .progress-bar {
   width: 100%;
-  height: 10px;
-  background-color: #ddd;
-  margin-top: 10px;
+  height: 8px;
+  background-color: #2a2a2a;
+  margin-top: 6px;
   overflow: hidden;
+  border-radius: 999px;
+  outline: 1px solid #3a3a3a;
 }
 
 .progress-bar span {
   display: block;
   height: 100%;
-  background-color: var(--main-bg-color);
+  background: linear-gradient(90deg, var(--accent), #ff6ea8);
   width: 0;
   transition: width 0.3s ease;
+}
+
+/* Time readout */
+.time {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 110px;
+  text-align: center;
+}
+
+/* Range slider for volume */
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: #2a2a2a;
+  border-radius: 999px;
+  outline: 1px solid #3a3a3a;
+  width: 120px;
+}
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+.slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: none;
+}
+
+select#speed-select {
+  background: #222;
+  color: var(--main-text-color);
+  border: 1px solid #333;
+  padding: 6px 8px;
+  border-radius: 8px;
+}
+
+/* Visually hidden (for a11y labels) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Cinema mode: immersive experience for music videos.
+     Rationale: dims surroundings without full-screen to retain quick access
+     to navigation and OS controls; supports study/portfolio viewing contexts. */
+body.cinema-mode {
+  background: #000;
+}
+body.cinema-mode header,
+body.cinema-mode nav,
+body.cinema-mode footer {
+  opacity: 0.2;
+  filter: blur(0.2px);
+  transition: opacity 0.2s ease;
+}
+body.cinema-mode .media-player {
+  max-width: 1200px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+}
+
+/* Responsive stack */
+@media (max-width: 640px) {
+  .custom-controls {
+    gap: 0.5rem;
+  }
+  .time {
+    min-width: 84px;
+    font-size: 0.9rem;
+  }
+  .slider {
+    width: 90px;
+  }
 }
 
 /* Footer styling */
