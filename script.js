@@ -79,7 +79,29 @@ function seekByClientX(clientX) {
 
 // Event wiring
 playPauseBtn.addEventListener("click", togglePlayPause);
-video.addEventListener("click", togglePlayPause); // Clicking video toggles playback (familiar pattern)
+video.addEventListener("click", togglePlayPause); // Clicking video toggles playback
+// In fullscreen, 'click' may be intercepted by the browser's UI.
+// Add pointer/touch handlers to ensure reliable toggling when in fullscreen.
+let lastDblClickAt = 0;
+video.addEventListener("dblclick", () => {
+  lastDblClickAt = Date.now();
+});
+video.addEventListener("pointerup", (e) => {
+  // Prevent accidental toggle right after a dblclick (used for fullscreen)
+  if (Date.now() - lastDblClickAt < 300) return;
+  // Only toggle if the primary pointer was used
+  if (e.button === 0 || e.pointerType === "touch" || e.pointerType === "pen") {
+    togglePlayPause();
+  }
+});
+video.addEventListener(
+  "touchend",
+  () => {
+    if (Date.now() - lastDblClickAt < 300) return;
+    togglePlayPause();
+  },
+  { passive: true }
+);
 video.addEventListener("play", updatePlayPauseIcon);
 video.addEventListener("pause", updatePlayPauseIcon);
 video.addEventListener("timeupdate", updateProgressBar);
@@ -170,12 +192,21 @@ fullscreenBtn.addEventListener("click", async () => {
   if (isFullscreen()) {
     await exitFs();
   } else {
-    await requestFs(document.documentElement);
+    await requestFs(video); // Request fullscreen to fill the entire screen
   }
   updateFsIcon();
 });
 document.addEventListener("fullscreenchange", updateFsIcon);
 document.addEventListener("webkitfullscreenchange", updateFsIcon);
+
+// Double-click video to toggle fullscreen (common pattern)
+video.addEventListener("dblclick", () => {
+  if (isFullscreen()) {
+    exitFs();
+  } else {
+    requestFs(video);
+  }
+});
 
 // Cinema Mode: toggles a class on body to dim surroundings without leaving page
 cinemaBtn.addEventListener("click", () => {

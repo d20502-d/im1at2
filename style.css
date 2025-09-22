@@ -89,7 +89,8 @@ nav a {
   gap: 0.75rem;
   margin-top: 10px;
   width: 100%;
-  flex-wrap: wrap; /* Responsive: wrap controls on narrow screens */
+  flex-wrap: nowrap; /* keep all contols in one line */
+  overflow-x: auto; /* allow horizontal scroll on narrow screens */
 }
 
 /* Iconic controls for play/pause/skip etc. */
@@ -197,7 +198,7 @@ select#speed-select {
 
 /* Cinema mode: immersive experience for music videos.
      Rationale: dims surroundings without full-screen to retain quick access
-     to navigation and OS controls; supports study/portfolio viewing contexts. */
+     to navigation and control */
 body.cinema-mode {
   background: #000;
 }

@@ -4,11 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Music Video Player</title>
-      <style>
-        p {
-            font-family: "generic-family", serif, sans-serif, monospace;
-        }
-      </style>
       <link rel="stylesheet" href="reset.css" />
       <link rel="stylesheet" href="style.css" />
       <script src="script.js" defer></script>
@@ -139,22 +134,6 @@
             <option value="1.5">1.5x</option>
             <option value="2">2x</option>
           </select>
-
-          <!-- Fullscreen -->
-          <button
-            id="fullscreen-btn"
-            class="icon-btn"
-            aria-label="Enter or exit fullscreen"
-          >
-            <img
-              id="fullscreen-img"
-              src="https://img.icons8.com/ios-glyphs/30/full-screen--v1.png"
-              alt="Fullscreen"
-              width="24"
-              height="24"
-            />
-          </button>
-
           <!-- Unique feature: Cinema Mode
           Design Rationale: For a music video, users often want an immersive, concert-like
           feeling without distractions. Cinema Mode dims the page around the video which
@@ -172,6 +151,23 @@
               height="24"
             />
           </button>
+          
+          <!-- Fullscreen -->
+          <button
+            id="fullscreen-btn"
+            class="icon-btn"
+            aria-label="Enter or exit fullscreen"
+          >
+            <img
+              id="fullscreen-img"
+              src="https://img.icons8.com/ios-glyphs/30/full-screen--v1.png"
+              alt="Fullscreen"
+              width="24"
+              height="24"
+            />
+          </button>
+
+
         </div>
       </div>
 
