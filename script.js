@@ -97,6 +97,7 @@ video.addEventListener("pointerup", (e) => {
     }, 250);
   }
 });
+
 // In fullscreen, 'click' may be intercepted by the browser's UI.
 // Add pointer/touch handlers to ensure reliable toggling when in fullscreen.
 video.addEventListener("mouseup", (e) => {
