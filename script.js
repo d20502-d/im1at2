@@ -2,7 +2,6 @@ const video = document.querySelector("#custom-video-player");
 const playPauseBtn = document.querySelector("#play-pause-btn");
 const playPauseImg = document.querySelector("#play-pause-img");
 const progressBar = document.querySelector("#progress-bar-fill");
-
 const timeline = document.querySelector("#timeline");
 const currentTimeEl = document.querySelector("#current-time");
 const totalTimeEl = document.querySelector("#total-time");
@@ -250,12 +249,12 @@ cinemaBtn.addEventListener("click", async () => {
   const enabling = !document.body.classList.contains("cinema-mode");
   if (enabling) {
     document.body.classList.add("cinema-mode");
-    // If not already fullscreen on the document, request it so the whole website fills the screen
+    // If not in fullscreen already, request it so the whole website fills the screen
     if (!document.fullscreenElement && !document.webkitFullscreenElement) {
       await requestFs(document.documentElement);
       cinemaFsActive = true;
     } else {
-      // Already fullscreen (possibly on video). Prefer document fullscreen for consistent UI.
+      // Already fullscreen. Prefer document fullscreen for consistent UI.
       if (
         document.fullscreenElement !== document.documentElement &&
         document.webkitFullscreenElement !== document.documentElement
