@@ -79,10 +79,9 @@ function seekByClientX(clientX) {
 
 // Event wiring
 playPauseBtn.addEventListener("click", togglePlayPause);
-video.addEventListener("click", togglePlayPause); // Clicking video toggles playback
-// In fullscreen, 'click' may be intercepted by the browser's UI.
-// Add pointer/touch handlers to ensure reliable toggling when in fullscreen.
+// Clicking video toggles playback
 let lastDblClickAt = 0;
+let justToggledViaPointer = false;
 video.addEventListener("dblclick", () => {
   lastDblClickAt = Date.now();
 });
@@ -92,13 +91,37 @@ video.addEventListener("pointerup", (e) => {
   // Only toggle if the primary pointer was used
   if (e.button === 0 || e.pointerType === "touch" || e.pointerType === "pen") {
     togglePlayPause();
+    // Debounce to avoid the subsequent 'click' from double-toggling
+    justToggledViaPointer = true;
+    setTimeout(() => {
+      justToggledViaPointer = false;
+    }, 250);
   }
 });
+// In fullscreen, 'click' may be intercepted by the browser's UI.
+// Add pointer/touch handlers to ensure reliable toggling when in fullscreen.
+video.addEventListener("mouseup", (e) => {
+  if (Date.now() - lastDblClickAt < 300) return;
+  if (justToggledViaPointer) return;
+  if (e.button === 0) {
+    togglePlayPause();
+    justToggledViaPointer = true;
+    setTimeout(() => {
+      justToggledViaPointer = false;
+    }, 250);
+  }
+});
+
+video.addEventListener("click", () => {
+  if (justToggledViaPointer) return;
+  togglePlayPause();
+});
+
 video.addEventListener(
   "touchend",
   () => {
     if (Date.now() - lastDblClickAt < 300) return;
-    togglePlayPause();
+    if (!justToggledViaPointer) togglePlayPause();
   },
   { passive: true }
 );
@@ -196,8 +219,21 @@ fullscreenBtn.addEventListener("click", async () => {
   }
   updateFsIcon();
 });
-document.addEventListener("fullscreenchange", updateFsIcon);
-document.addEventListener("webkitfullscreenchange", updateFsIcon);
+document.addEventListener("fullscreenchange", () => {
+  updateFsIcon();
+  // If user exits fullscreen via Esc while in cinema, turn cinema off
+  if (!document.fullscreenElement && cinemaFsActive) {
+    document.body.classList.remove("cinema-mode");
+    cinemaFsActive = false;
+  }
+});
+document.addEventListener("webkitfullscreenchange", () => {
+  updateFsIcon();
+  if (!document.webkitFullscreenElement && cinemaFsActive) {
+    document.body.classList.remove("cinema-mode");
+    cinemaFsActive = false;
+  }
+});
 
 // Double-click video to toggle fullscreen (common pattern)
 video.addEventListener("dblclick", () => {
@@ -208,9 +244,43 @@ video.addEventListener("dblclick", () => {
   }
 });
 
-// Cinema Mode: toggles a class on body to dim surroundings without leaving page
-cinemaBtn.addEventListener("click", () => {
-  document.body.classList.toggle("cinema-mode");
+// Cinema Mode: immersive mode + request fullscreen on the entire page
+let cinemaFsActive = false; // track whether fullscreen was initiated by cinema mode
+cinemaBtn.addEventListener("click", async () => {
+  const enabling = !document.body.classList.contains("cinema-mode");
+  if (enabling) {
+    document.body.classList.add("cinema-mode");
+    // If not already fullscreen on the document, request it so the whole website fills the screen
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      await requestFs(document.documentElement);
+      cinemaFsActive = true;
+    } else {
+      // Already fullscreen (possibly on video). Prefer document fullscreen for consistent UI.
+      if (
+        document.fullscreenElement !== document.documentElement &&
+        document.webkitFullscreenElement !== document.documentElement
+      ) {
+        try {
+          await exitFs();
+        } catch {}
+        try {
+          await requestFs(document.documentElement);
+          cinemaFsActive = true;
+        } catch {}
+      }
+    }
+  } else {
+    document.body.classList.remove("cinema-mode");
+    if (
+      cinemaFsActive &&
+      (document.fullscreenElement || document.webkitFullscreenElement)
+    ) {
+      try {
+        await exitFs();
+      } catch {}
+    }
+    cinemaFsActive = false;
+  }
 });
 
 // Keyboard shortcuts for familiar streaming UX
